@@ -18,3 +18,27 @@ class HTMLNode:
     def __repr__(self):
         return f"details on called HTMLNode:\n'TAG': {self.tag}\n'VALUE': {self.value}\n'CHILDREN': {self.children}\n'PROPS': {self.props}\n\nany values not given default to None"
         
+class LeafNode(HTMLNode):
+    def __init__(self, tag, value, props=None):
+        super().__init__(tag, value, None, props)
+    
+    def to_html(self):
+        if self.value==None:
+            raise ValueError
+        if self.tag==None:
+            return str(self.value)
+        if self.props != None:
+            prop_str=""
+            for key in self.props:
+                prop_str+=f'{key}="{self.props[key]}" '
+            if prop_str[-1]==" ":
+                prop_str = prop_str[:-1]
+            beg_tag=f'<{self.tag} {prop_str}>' 
+            end_tag=f'</{self.tag}>'
+            return f"{beg_tag}{self.value}{end_tag}"
+        beg_tag=f'<{self.tag}>' 
+        end_tag=f'</{self.tag}>'
+        return beg_tag+self.value+end_tag
+
+
+

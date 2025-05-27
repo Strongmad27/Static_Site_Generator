@@ -40,5 +40,39 @@ class LeafNode(HTMLNode):
         end_tag=f'</{self.tag}>'
         return beg_tag+self.value+end_tag
 
+class ParentNode(HTMLNode):
+    def __init__(self, tag, children, props=None):
+        super().__init__(tag, None, children, props)
+
+    def to_html(self):
+        if self.tag == None:
+            raise ValueError ("Tag Required for Parent Node")
+        if self.children == None:
+            raise ValueError ("Children Required for Parent Node")
+        par_str=""
+        beg_tag=f'<{self.tag}>'
+        end_tag=f'</{self.tag}>'
+        if self.props != None:
+            prop_str=""
+            for key in self.props:
+                prop_str+=f'{key}="{self.props[key]}" '
+            if prop_str[-1]==" ":
+                prop_str = prop_str[:-1]
+            beg_tag=f'<{self.tag} {prop_str}>'
+            return beg_tag
+        par_str = par_str + beg_tag
+        for child in self.children:
+            child_str = ""
+            if isinstance(child, LeafNode):
+                child_str = LeafNode.to_html(child)
+                par_str = par_str + child_str
+            else:
+                child_str = ParentNode.to_html(child)
+                par_str = par_str + child_str
+        return par_str + end_tag
+
+
+
+
 
 

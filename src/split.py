@@ -28,6 +28,10 @@ def split_nodes_image(old_nodes):
     new_nodes = []
     for node in old_nodes:
         current_text = node.text
+        node_texttype = node.text_type
+        if node_texttype != TextType.TEXT:
+            new_nodes.append(node)
+            continue
         while True:
             check_tup = extract_markdown_images(current_text)
             if not check_tup and current_text != "":
@@ -53,6 +57,10 @@ def split_nodes_links(old_nodes):
     new_nodes = []
     for node in old_nodes:
         current_text = node.text
+        node_texttype = node.text_type
+        if node_texttype != TextType.TEXT:
+            new_nodes.append(node)
+            continue
         while True:
             check_tup = extract_markdown_links(current_text)
             if not check_tup and current_text != "":

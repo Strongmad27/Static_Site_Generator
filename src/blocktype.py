@@ -7,12 +7,14 @@ class BlockType(Enum):
     QUOTE = "quote"
     UNORDERED_LIST = "unordered_list"
     ORDERED_LIST = "ordered_list"
-def block_to_block_type(md):
-    md_copy = md.split("\n")
-    if md[:2] == "# " or md[:3] == "## " or md[:4] == "### " or md[:5] == "#### " or md[:6] == "##### " or md[:7] == "###### ":
+def block_to_block_type(markdown):
+    md_copy = markdown.split("\n")
+    if markdown[:2] == "# " or markdown[:3] == "## " or markdown[:4] == "### " or markdown[:5] == "#### " or markdown[:6] == "##### " or markdown[:7] == "###### ":
         return BlockType.HEADING
-    if md[:3] == "```" and md[-3:] == "```":
+    if markdown[:3] == "```" and markdown[-3:] == "```":
         return BlockType.CODE
+    if "" in md_copy:
+        return BlockType.PARAGRAPH
     for md in md_copy:
         if md[0] != ">":
             break

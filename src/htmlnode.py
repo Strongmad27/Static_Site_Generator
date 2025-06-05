@@ -1,9 +1,12 @@
 class HTMLNode:
     def __init__(self, tag=None, value=None, children=None, props=None):
         self.tag = tag
+        ## tag is HTML markups
         self.value = value
+        ## string representing value i.e. text
         self.children = children
         self.props = props
+        ## props is a {dictionary} for attributes of the HTML tag
 
     def to_html(self):
         raise NotImplementedError

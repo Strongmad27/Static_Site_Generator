@@ -20,78 +20,89 @@ def markdown_to_html_node(markdown):
         blocktype = block_to_block_type(block)
         ##referencing blocktype, create HTMLNode from the block
         if blocktype != BlockType.CODE:
-            TN_list = text_to_textnodes(block)
+            block_lines = block.splitlines()
+            b_l_list = []
+            for line in block_lines:
+                tn_list = text_to_textnodes(line)
+                b_l_list.append(tn_list)
+                ###creates a matrix of lists of textnodes, where each inner list of textnodes representing an entire line of the block
             leaf_list=[]
-            for node in TN_list:
-                new_HN = text_node_to_html_node(node)
-                leaf_list.append(new_HN)
+            for tn_line in b_l_list:
+                html_line = []                
+                for node in tn_line:
+                    new_HN = text_node_to_html_node(node)
+                    html_line.append(new_HN)
+                leaf_list.append(html_line)
             block_tag = blocktype_to_tag(blocktype, block)
-            if blocktype == BlockType.UNORDERED_LIST:
-                ul_leafs = []
-                for ul_item in leaf_list:
-                    ul_list = []
-                    ul_list.append(ul_item)
-                    ul_leaf = ParentNode('<li>', ul_list)
-                    ul_leafs.append(ul_leaf)
-                new_ul_node = ParentNode(block_tag, ul_leafs)
-                html_nodes.append(new_ul_node)
-            if blocktype == BlockType.ORDERED_LIST:
-                ol_leafs = []
-                for ol_item in leaf_list:
-                    ol_list = []
-                    ol_list.append(ol_item)
-                    ol_leaf = ParentNode('<li>', ol_list)
-                    ol_leafs.append(ol_leaf)
-                new_ol_node = ParentNode(block_tag, ol_leafs)
-                html_nodes.append(new_ol_node)
+            if blocktype == BlockType.UNORDERED_LIST or blocktype == BlockType.ORDERED_LIST:
+                new_list_node = list_block_to_HTMLNode(leaf_list, block_tag)
+                html_nodes.append(new_list_node)
+            new_list=[]
             if blocktype == BlockType.QUOTE:
-                qu_leafs = []
-                for qu_item in leaf_list:
-                    qu_leaf = LeafNode(None, qu_item)
-                    qu_leafs.append(qu_leaf)
-                new_qu_node = ParentNode(block_tag, None, qu_leafs)
-                html_nodes.append(new_qu_node)
+                for line in block_lines:
+                    new_line = line[1:]
+                    new_list.append(new_line)
+                delim = '\n'
+                old_block = delim.join(block_lines)
+                new_html = raw_block_to_child_node(old_block, block_tag)
+                html_nodes.append(new_html)
             if blocktype == BlockType.HEADING:
-                he_leafs = []
-                fir_str = leaf_list[0]
-                if block_tag == '<h1>':
-                    fir_str = fir_str[-2]
-                elif block_tag == '<h2>':
-                    fir_str = fir_str[-3]
-                elif block_tag == '<h3>':
-                    fir_str = fir_str[-4]
-                elif block_tag == '<h4>':
-                    fir_str = fir_str[-5]
-                elif block_tag == '<h5>':
-                    fir_str = fir_str[-6]
-                elif block_tag == '<h6>':
-                    fir_str = fir_str[-7]
-                leaf_list[0] = fir_str
-                for he_item in leaf_list:
-                    he_leaf = LeafNode(None, he_item)
-                    he_leafs.append(he_leaf)
-                new_he_par = ParentNode(block_tag, None, he_leafs)
-                html_nodes.append(new_he_par)
+                fir_str = block_lines[0]
+                if block_tag == 'h1':
+                    fir_str = fir_str[2:]
+                elif block_tag == 'h2':
+                    fir_str = fir_str[3:]
+                elif block_tag == 'h3':
+                    fir_str = fir_str[4:]
+                elif block_tag == 'h4':
+                    fir_str = fir_str[5:]
+                elif block_tag == 'h5':
+                    fir_str = fir_str[6:]
+                elif block_tag == 'h6':
+                    fir_str = fir_str[7:]
+                block_lines[0] = fir_str
+                delim = '\n'
+                old_block = delim.join(block_lines)
+                new_html = raw_block_to_child_node(old_block, block_tag)
+                html_nodes.append(new_html)
             if blocktype == BlockType.PARAGRAPH:
-                pa_leafs = []
-                for pa_item in leaf_list:
-                    pa_leaf = LeafNode(None, pa_item)
-                    pa_leafs.append(pa_leaf)
-                new_pa_node = ParentNode(block_tag, None, pa_leafs)
-                html_nodes.append(new_pa_node)
+                new_html = raw_block_to_child_node(block, block_tag)
+                html_nodes.append(new_html)
         if blocktype == BlockType.CODE:
             code_text_list = block.splitlines()
             code_text_list = code_text_list[1:-1]
+            text_list=[]
+            for line in code_text_list:
+                st_line = line.strip()
+                text_list.append(st_line)
             new_line = '\n'
-            code_text = new_line.join(code_text_list)
+            code_text = new_line.join(text_list)+'\n'
             new_leaf = [LeafNode(None, code_text),]
-            co_leafs = [ParentNode('code', None, new_leaf)]
-            new_code_par = ParentNode('pre', None, co_leafs)
-            html_nodes.append(new_code_par) 
-    big_bad_parent = ParentNode('div', None, html_nodes)
+            co_leafs = [ParentNode('code', new_leaf)]
+            new_code_par = ParentNode('pre', co_leafs)
+            html_nodes.append(new_code_par)
+    big_bad_parent = ParentNode('div', html_nodes)
     return big_bad_parent
 
 ##helper functions below:
+
+def raw_block_to_child_node(block, block_tag):
+    hn_list = []
+    new_tn = text_to_textnodes(block)
+    for tn in new_tn:
+        new_leaf = text_node_to_html_node(tn)
+        hn_list.append(new_leaf)
+    new_par = ParentNode(block_tag, hn_list)
+    return new_par
+
+
+def list_block_to_HTMLNode(leaf_list, block_tag):
+    leafs = []
+    for leaf in leaf_list:
+        leaf_line = ParentNode('li', leaf)
+        leafs.append(leaf_line)
+    new_list_node = ParentNode(block_tag, leafs)
+    return new_list_node
 
 def hash_counter(block):
     hash = '#'
@@ -101,30 +112,32 @@ def hash_counter(block):
         if block[i] == hash:
             i += 1
         elif block[i] == ' ':
-            return f'<h{i}>'
+            return f'h{i}'
 
 def blocktype_to_tag(blocktype, block):
     if blocktype == BlockType.PARAGRAPH:
-        block_tag = '<p>'
+        block_tag = 'p'
         return block_tag
-    
+   
     if blocktype == BlockType.HEADING:
         block_tag = hash_counter(block[0])
         return block_tag
-    
+   
     if blocktype == BlockType.QUOTE:
-        block_tag = '<blockquote>'
+        block_tag = 'blockquote'
         return block_tag
-    
+   
     if blocktype == BlockType.CODE:
-        block_tag = '<code>'
+        block_tag = 'code'
         return block_tag
 
     if blocktype == BlockType.UNORDERED_LIST:
-        block_tag = '<ul>'
+        block_tag = 'ul'
         return block_tag
 
     if blocktype == BlockType.ORDERED_LIST:
-        block_tag = '<ol>'
+        block_tag = 'ol'
         return block_tag
-    
+   
+
+

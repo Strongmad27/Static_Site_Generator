@@ -17,6 +17,8 @@ def markdown_to_html_node(markdown):
     ## created list of markdown blocks to iterate over, determine types, then convert to HTMLNodes
     html_nodes = []
     for block in blocked_markdown_list:
+        if not block.strip():
+            continue
         blocktype = block_to_block_type(block)
         ##referencing blocktype, create HTMLNode from the block
         if blocktype != BlockType.CODE:
@@ -88,7 +90,17 @@ def markdown_to_html_node(markdown):
 
 def raw_block_to_child_node(block, block_tag):
     hn_list = []
-    new_tn = text_to_textnodes(block)
+    if block_tag == 'p':
+        spl_bl=block.split('\n')
+        cleaned_text = []
+        for line in spl_bl:
+            stp_ln=line.strip()
+            cleaned_text.append(stp_ln)
+        spacer = ' '
+        new_bl=spacer.join(cleaned_text)
+        new_tn = text_to_textnodes(new_bl)
+    else:
+        new_tn = text_to_textnodes(block)
     for tn in new_tn:
         new_leaf = text_node_to_html_node(tn)
         hn_list.append(new_leaf)

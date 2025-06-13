@@ -62,7 +62,6 @@ class ParentNode(HTMLNode):
             if prop_str[-1]==" ":
                 prop_str = prop_str[:-1]
             beg_tag=f'<{self.tag} {prop_str}>'
-            return beg_tag
         par_str = par_str + beg_tag
         for child in self.children:
             child_str = ""

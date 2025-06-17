@@ -1,11 +1,7 @@
 from blocktype import block_to_block_type, BlockType
-from extract import extract_markdown_images, extract_markdown_links
-from htmlnode import ParentNode, LeafNode, HTMLNode
-from main import text_node_to_html_node
+from htmlnode import ParentNode, LeafNode
 from md_to_block import markdown_to_blocks
-from split import split_nodes_delimiter, split_nodes_image, split_nodes_links
-from text_to import text_to_textnodes
-from textnode import TextNode, TextType
+from text_to import text_to_textnodes, text_node_to_html_node
 
 ##takes full markdown document and returns single parent node containg everything split into leaf nodes
 
@@ -23,6 +19,9 @@ def markdown_to_html_node(markdown):
         ##referencing blocktype, create HTMLNode from the block
         if blocktype != BlockType.CODE:
             block_lines = block.splitlines()
+            if blocktype == BlockType.ORDERED_LIST:
+                for line in block_lines:
+                    line = line[3:]
             b_l_list = []
             for line in block_lines:
                 tn_list = text_to_textnodes(line)
@@ -35,7 +34,7 @@ def markdown_to_html_node(markdown):
                     new_HN = text_node_to_html_node(node)
                     html_line.append(new_HN)
                 leaf_list.append(html_line)
-            block_tag = blocktype_to_tag(blocktype, block)
+            block_tag = blocktype_to_tag(blocktype, block_lines)
             if blocktype == BlockType.UNORDERED_LIST or blocktype == BlockType.ORDERED_LIST:
                 new_list_node = list_block_to_HTMLNode(leaf_list, block_tag)
                 html_nodes.append(new_list_node)
@@ -119,7 +118,7 @@ def list_block_to_HTMLNode(leaf_list, block_tag):
 def hash_counter(block):
     hash = '#'
     i = 0
-    length = max(7, len(block))
+    length = len(block)
     for i in range(0, length):
         if block[i] == hash:
             i += 1

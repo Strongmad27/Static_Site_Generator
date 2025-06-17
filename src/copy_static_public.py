@@ -1,7 +1,5 @@
 import os
 import shutil
-path = '/home/bkeller/Static_Site_Generator/public'
-static_path = '/home/bkeller/Static_Site_Generator/static'
 
 def public_clearing_house(path):
     try:
@@ -21,6 +19,3 @@ def copy_paste(static_path, path):
             os.mkdir(pub_path)
             copy_paste(item_path, pub_path)
             print(f'{pub_path}')
-
-public_clearing_house(path)
-copy_paste(static_path, path)

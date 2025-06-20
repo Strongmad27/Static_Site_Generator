@@ -1,4 +1,5 @@
 from enum import Enum
+import re
 
 class BlockType(Enum):
     PARAGRAPH = "paragraph"
@@ -9,12 +10,11 @@ class BlockType(Enum):
     ORDERED_LIST = "ordered_list"
 def block_to_block_type(markdown):
     md_copy = markdown.split("\n")
-    if markdown[:2] == "# " or markdown[:3] == "## " or markdown[:4] == "### " or markdown[:5] == "#### " or markdown[:6] == "##### " or markdown[:7] == "###### ":
+    print(f'what is submitted to block_to_blocktype:\n\n{markdown}\n\n')
+    if markdown.strip().startswith(("# ", "## ", "### ", "#### ", "##### ", "###### ")):
         return BlockType.HEADING
     if markdown[:3] == "```" and markdown[-3:] == "```":
         return BlockType.CODE
-    if "" in md_copy:
-        return BlockType.PARAGRAPH
     for md in md_copy:
         if md[0] != ">":
             break
@@ -25,12 +25,12 @@ def block_to_block_type(markdown):
             break
     else:
         return BlockType.UNORDERED_LIST
-    for i in range(0, len(md_copy)):
-        x = i + 1
-        prefix = str(f'{x}. ')
-        if not md_copy[i].startswith(prefix):
-            break
-    else:
+    if markdown.strip().startswith("1. "):
+        i = 1
+        for line in md_copy:
+            if not line.startswith(f"{i}. "):
+                return BlockType.PARAGRAPH
+            i += 1
         return BlockType.ORDERED_LIST
     return BlockType.PARAGRAPH
     

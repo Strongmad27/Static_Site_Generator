@@ -1,37 +1,25 @@
 import unittest
 from md_to_html_node import markdown_to_html_node
+from blocktype import block_to_block_type, BlockType
+from md_to_block import markdown_to_blocks
 
-class TestMDToHTML(unittest.TestCase):
-    def test_paragraphs(self):
+class TestTextTo(unittest.TestCase):
+    def test_ulist(self):
         md = """
-    This is **bolded** paragraph
-    text in a p
-    tag here
+- this
+- is how *a* ulist
+- should look
+- B. Keller
 
-    This is another paragraph with _italic_ text and `code` here
+and here is a paragraph
+"""
 
-    """
-
+        block = markdown_to_blocks(md)
+        blocktype = block_to_block_type(block[0])
         node = markdown_to_html_node(md)
-        print(f'{node}')
         html = node.to_html()
         self.assertEqual(
             html,
-            "<div><p>This is <b>bolded</b> paragraph text in a p tag here</p><p>This is another paragraph with <i>italic</i> text and <code>code</code> here</p></div>",
-        )
+"<div><ul><li>this</li><li>is how <i>a</i> ulist</li><li>should look</li><li>B. Keller</li></ul><p>and here is a paragraph</p></div>",
+)
 
-    def test_codeblock(self):
-        md = """
-    ```
-    This is text that _should_ remain
-    the **same** even with inline stuff
-    ```
-    """
-
-        node = markdown_to_html_node(md)
-        print(f'{node}')
-        html = node.to_html()
-        self.assertEqual(
-            html,
-            "<div><pre><code>This is text that _should_ remain\nthe **same** even with inline stuff\n</code></pre></div>",
-        )

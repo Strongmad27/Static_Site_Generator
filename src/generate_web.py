@@ -16,7 +16,11 @@ def generate_page(from_path, template_path, dest_path):
         read_source = source.read()
     with open(template_path) as template:
         read_template = template.read()
+    if read_source == None:
+        print ('read_source returning None')
     source_html = markdown_to_html_node(read_source).to_html()
+    if source_html == None:
+        print(f'\n\nsource_html returning None')
     source_title = extract_title(read_source)
     new_html = read_template.replace('{{ Title }}', source_title)
     new_html = new_html.replace('{{ Content }}', source_html)

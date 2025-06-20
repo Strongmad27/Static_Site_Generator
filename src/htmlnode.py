@@ -19,7 +19,7 @@ class HTMLNode:
         return props_str
     
     def __repr__(self):
-        return f"details on called HTMLNode:\n'TAG': {self.tag}\n'VALUE': {self.value}\n'CHILDREN': {self.children}\n'PROPS': {self.props}\n\nany values not given default to None"
+        return f"\n'TAG':{self.tag}\n'VALUE':{self.value}\n'CHILDREN':{self.children}\n'PROPS':{self.props}\n\n"
         
 class LeafNode(HTMLNode):
     def __init__(self, tag, value, props=None):
@@ -63,18 +63,8 @@ class ParentNode(HTMLNode):
                 prop_str = prop_str[:-1]
             beg_tag=f'<{self.tag} {prop_str}>'
         par_str = par_str + beg_tag
-        for child in self.children:
-            child_str = ""
-            if isinstance(child, LeafNode):
-                child_str = LeafNode.to_html(child)
-                par_str = par_str + child_str
-            else:
-                child_str = ParentNode.to_html(child)
-                par_str = par_str + child_str
+        for child in self.children:    
+            child_str = child.to_html()
+            par_str = par_str + child_str
         return par_str + end_tag
-
-
-
-
-
-
+        

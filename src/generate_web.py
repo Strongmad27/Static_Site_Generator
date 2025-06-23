@@ -9,7 +9,7 @@ def extract_title(markdown):
             return line[2:].strip()
     raise Exception ('no title header found')
 
-def generate_page(from_path, template_path, dest_path):
+def generate_page(from_path, template_path, dest_path, basepath):
     print(f'Generating page from {from_path} to {dest_path} using {template_path}')
     if not os.path.isfile(from_path):
         raise Exception ('from_path does not point to md file')
@@ -25,12 +25,14 @@ def generate_page(from_path, template_path, dest_path):
     source_title = extract_title(read_source)
     new_html = read_template.replace('{{ Title }}', source_title)
     new_html = new_html.replace('{{ Content }}', source_html)
+    new_html = new_html.replace('href="/', 'href="{basepath}')
+    new_html = new_html.replace('src="/', 'src="{basepath}')    
     dest_dir = os.path.dirname(dest_path)
     os.makedirs(dest_dir, exist_ok=True)
     with open(dest_path, 'w') as file:
         file.write(new_html)
             
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, basepath):
     print(f'Generating pade from {dir_path_content} directory to Public')
     for item in os.listdir(dir_path_content):
         item_path = os.path.join(dir_path_content, item)
@@ -38,10 +40,10 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
         if os.path.isfile(item_path):
             if item_path.endswith('.md'):
                 pub_path = pub_path.replace('.md', '.html')
-                generate_page(item_path, template_path, pub_path)
+                generate_page(item_path, template_path, pub_path, basepath)
             else:
                 shutil.copy(item_path, pub_path)
             print(f'{pub_path}')
         elif os.path.isdir(item_path):
             public_clearing_house(pub_path)
-            generate_pages_recursive(item_path, template_path, pub_path)
+            generate_pages_recursive(item_path, template_path, pub_path, basepath)

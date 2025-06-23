@@ -9,17 +9,12 @@ from md_to_html_node import markdown_to_html_node, raw_block_to_child_node, list
 import os
 import shutil
 from copy_static_public import  public_clearing_house, copy_paste
-from generate_web import generate_page, extract_title
+from generate_web import generate_page, extract_title, generate_pages_recursive
 
 def main():
     public_clearing_house('public')
     copy_paste('static', 'public')
-    generate_page('content/index.md', 'template.html', 'public/index.html')
-    generate_page('content/blog/glorfindel/index.md', 'template.html', 'public/blog/glorfindel/index.html')
-    generate_page('content/blog/tom/index.md', 'template.html', 'public/blog/tom/index.html')
-    generate_page('content/blog/majesty/index.md', 'template.html', 'public/blog/majesty/index.html')
-    generate_page('content/contact/index.md', 'template.html', 'public/contact/index.html')
-
+    generate_pages_recursive('content', 'template.html', 'public')
   
 
 if __name__ == "__main__":

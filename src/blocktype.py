@@ -10,7 +10,6 @@ class BlockType(Enum):
     ORDERED_LIST = "ordered_list"
 def block_to_block_type(markdown):
     md_copy = markdown.split("\n")
-    print(f'what is submitted to block_to_blocktype:\n\n{markdown}\n\n')
     if markdown.strip().startswith(("# ", "## ", "### ", "#### ", "##### ", "###### ")):
         return BlockType.HEADING
     if markdown[:3] == "```" and markdown[-3:] == "```":

@@ -1,5 +1,6 @@
 from md_to_html_node import markdown_to_html_node
-import os
+import os, shutil
+from copy_static_public import copy_paste, public_clearing_house
 
 def extract_title(markdown):
     lined_md = markdown.splitlines()
@@ -30,4 +31,17 @@ def generate_page(from_path, template_path, dest_path):
         file.write(new_html)
             
 def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
-                
+    print(f'Generating pade from {dir_path_content} directory to Public')
+    for item in os.listdir(dir_path_content):
+        item_path = os.path.join(dir_path_content, item)
+        pub_path = os.path.join(dest_dir_path, item)
+        if os.path.isfile(item_path):
+            if item_path.endswith('.md'):
+                pub_path = pub_path.replace('.md', '.html')
+                generate_page(item_path, template_path, pub_path)
+            else:
+                shutil.copy(item_path, pub_path)
+            print(f'{pub_path}')
+        elif os.path.isdir(item_path):
+            public_clearing_house(pub_path)
+            generate_pages_recursive(item_path, template_path, pub_path)

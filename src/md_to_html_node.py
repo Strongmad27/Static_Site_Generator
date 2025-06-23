@@ -12,17 +12,14 @@ def markdown_to_html_node(markdown):
 
     ## created list of markdown blocks to iterate over, determine types, then convert to HTMLNodes
     html_nodes = []
-    print(f'my blocked markdown list:\n{blocked_markdown_list}\n\n')
     for block in blocked_markdown_list:
         if not block.strip():
             continue
         blocktype = block_to_block_type(block)
-        print(f'here is the blocktyp coming out of it:\n{blocktype}\n\n')
         ##referencing blocktype, create HTMLNode from the block
         if blocktype != BlockType.CODE:
             block_lines = block.splitlines()
             block_tag = blocktype_to_tag(blocktype, block_lines)
-            print(f'here is the blocktag coming out of my blocktype_to_tag:\n{block_tag}\n\n')
             if blocktype == BlockType.ORDERED_LIST:
                 ol_list = []
                 ol_nodes = []
